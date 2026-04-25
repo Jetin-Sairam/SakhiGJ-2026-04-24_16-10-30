@@ -17,15 +17,21 @@ public class MainMenuManager : MonoBehaviour
         continueButton?.onClick.AddListener(OnContinue);
     }
 
-    private void OnNewGame()
+    public void OnNewGame()
     {
         Debug.Log("New Game.");
         SaveManager.Instance.NewGame(firstSceneName);
     }
 
-    private void OnContinue()
+    public void OnContinue()
     {
         Debug.Log("Continue.");
         SaveManager.Instance.ContinueGame();
+    }
+
+    public void OnQuit()
+    {
+        Debug.Log("Quit Game.");
+        Application.Quit();
     }
 }
