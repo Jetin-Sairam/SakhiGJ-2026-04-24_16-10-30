@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class PlayerController : MonoBehaviour
 {
     public float speed = 5f;
+    public float interactClipLength = 0.5f; // Set this to your Interact clip length
 
     private string SceneSwitch;
     private Collider2D currentInteractable;
@@ -31,7 +32,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // If diary is open — only R closes it, block everything else
+        // Diary open — only R closes it, block everything else
         if (FadeManager.Instance != null && FadeManager.Instance.IsDiaryOpen)
         {
             if (Input.GetKeyDown(KeyCode.R))
@@ -69,8 +70,6 @@ public class PlayerController : MonoBehaviour
         {
             if (FadeManager.Instance != null)
                 FadeManager.Instance.TogglePreview();
-            else
-                Debug.LogWarning("FadeManager.Instance is null.");
         }
 
         // Toggle diary
@@ -128,6 +127,10 @@ public class PlayerController : MonoBehaviour
         {
             currentInteractable = collision;
             diaryUnlocker = collision.gameObject.GetComponent<DiaryUnlocker>();
+
+            // ADD THIS LINE
+            Debug.Log($"DiaryUnlocker component found: {diaryUnlocker != null}");
+
             SpriteRenderer targetRenderer = collision.gameObject.GetComponent<SpriteRenderer>();
             if (targetRenderer != null)
             {
@@ -202,10 +205,18 @@ public class PlayerController : MonoBehaviour
         // --- Diary unlock ---
         if (collider.CompareTag("Diary"))
         {
+            // ADD THESE LINES
+            Debug.Log($"E pressed on Diary — diaryUnlocker is null: {diaryUnlocker == null}");
+            Debug.Log($"FadeManager diary unlocked state: {FadeManager.Instance.IsDiaryUnlocked}");
+
             if (diaryUnlocker != null)
             {
                 diaryUnlocker.Unlock();
                 Debug.Log("Diary unlock triggered.");
+            }
+            else
+            {
+                Debug.LogError("diaryUnlocker is NULL — DiaryUnlocker.cs not attached to the Diary GameObject!");
             }
             return;
         }
@@ -219,7 +230,6 @@ public class PlayerController : MonoBehaviour
                 return;
             }
 
-            // No gate on this trigger — go freely
             if (sceneGate == null)
             {
                 Debug.Log("No gate — loading scene freely.");
@@ -227,7 +237,6 @@ public class PlayerController : MonoBehaviour
                 return;
             }
 
-            // Gate already unlocked
             if (sceneGate.IsUnlocked())
             {
                 Debug.Log("Gate already unlocked — loading scene.");
@@ -235,7 +244,6 @@ public class PlayerController : MonoBehaviour
                 return;
             }
 
-            // Gate requires no item
             if (sceneGate.IsNoItemRequired())
             {
                 Debug.Log("Gate requires no item — unlocking and loading.");
@@ -244,13 +252,12 @@ public class PlayerController : MonoBehaviour
                 return;
             }
 
-            // Gate requires a specific item
             string selected = FadeManager.Instance.GetSelectedItem();
             Debug.Log($"Gate requires '{sceneGate.GetRequiredItem()}', selected: '{selected}'");
 
             if (selected == null)
             {
-                Debug.Log("No item selected. Use scroll wheel to select.");
+                Debug.Log("No item selected. Use scroll wheel.");
                 return;
             }
 
@@ -275,30 +282,27 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("isWalking", false);
         animator.SetBool("isInteracting", true);
 
-        Debug.Log("isInteracting = true — waiting for Interact state.");
-
+        // Wait a few frames for animator to react
         yield return null;
         yield return null;
+        yield return null;
 
-        int waited = 0;
-        while (!animator.GetCurrentAnimatorStateInfo(0).IsName("Interact") && waited < 10)
+        // Read clip length from current state — no name check
+        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+        float length = state.length;
+
+        // If animator didn't switch, fall back to inspector value
+        if (length < 0.05f)
         {
-            yield return null;
-            waited++;
+            Debug.LogWarning($"Clip length too small ({length}s) — using interactClipLength: {interactClipLength}s");
+            length = interactClipLength;
+        }
+        else
+        {
+            Debug.Log($"Interact clip length: {length}s");
         }
 
-        if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Interact"))
-        {
-            Debug.LogError("Could not reach Interact state — releasing player.");
-            animator.SetBool("isInteracting", false);
-            isInteracting = false;
-            yield break;
-        }
-
-        Debug.Log("In Interact state — waiting for clip to finish.");
-
-        float clipLength = animator.GetCurrentAnimatorStateInfo(0).length;
-        yield return new WaitForSeconds(clipLength);
+        yield return new WaitForSeconds(length);
 
         animator.SetBool("isInteracting", false);
         animator.SetBool("isWalking", false);

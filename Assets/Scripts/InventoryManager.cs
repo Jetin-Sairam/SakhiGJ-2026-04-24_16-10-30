@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class InventoryManager : MonoBehaviour
 {
@@ -35,9 +34,8 @@ public class InventoryManager : MonoBehaviour
     public void AddItem(string itemName)
     {
         inventoryItems.Add(itemName);
-        Debug.Log($"InventoryManager: added '{itemName}'. Total: {inventoryItems.Count}");
+        Debug.Log($"Added '{itemName}'. Total: {inventoryItems.Count}");
 
-        // Auto-save whenever inventory changes
         if (SaveManager.Instance != null)
             SaveManager.Instance.SaveAll();
     }
@@ -54,11 +52,8 @@ public class InventoryManager : MonoBehaviour
         return pickedUpObjects.Contains(sceneName + "/" + objectName);
     }
 
-    // For SaveManager
     public HashSet<string> GetPickedUpSet() => pickedUpObjects;
-
     public void ClearPickedUp() => pickedUpObjects.Clear();
-
     public void RestorePickedUp(string entry) => pickedUpObjects.Add(entry);
 
     public Sprite GetSprite(string itemName)
@@ -67,7 +62,7 @@ public class InventoryManager : MonoBehaviour
             if (item.name == itemName)
                 return item.icon;
 
-        Debug.LogWarning($"InventoryManager: No sprite found for '{itemName}'.");
+        Debug.LogWarning($"No sprite for '{itemName}'.");
         return null;
     }
 

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -6,7 +6,6 @@ public class SaveManager : MonoBehaviour
 {
     public static SaveManager Instance { get; private set; }
 
-    // PlayerPrefs keys
     private const string KEY_HAS_SAVE = "HasSave";
     private const string KEY_CURRENT_SCENE = "CurrentScene";
     private const string KEY_INVENTORY = "Inventory";
@@ -27,7 +26,7 @@ public class SaveManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    // ?? Public API ????????????????????????????????????????????
+    // ── Public API ────────────────────────────────────────────
 
     public bool HasSave()
     {
@@ -36,17 +35,16 @@ public class SaveManager : MonoBehaviour
 
     public void NewGame(string firstSceneName)
     {
-        // Wipe all saved data
         PlayerPrefs.DeleteAll();
         PlayerPrefs.SetInt(KEY_HAS_SAVE, 1);
         PlayerPrefs.Save();
 
-        // Reset runtime state
         InventoryManager.Instance.inventoryItems.Clear();
         InventoryManager.Instance.ClearPickedUp();
         FadeManager.Instance.ResetDiary();
+        SceneItemRequirement.ClearUnlockedGates();
 
-        Debug.Log("New game started � all data wiped.");
+        Debug.Log("New game — save wiped.");
         FadeManager.Instance.FadeToScene(firstSceneName);
     }
 
@@ -54,33 +52,33 @@ public class SaveManager : MonoBehaviour
     {
         if (!HasSave())
         {
-            Debug.LogWarning("No save data found.");
+            Debug.LogWarning("No save found.");
             return;
         }
 
-        // Load inventory into InventoryManager before scene loads
         LoadInventory();
         LoadPickedUp();
+        LoadDiaryState();
+        LoadUnlockedGates();
 
         string scene = PlayerPrefs.GetString(KEY_CURRENT_SCENE, "");
         if (!string.IsNullOrEmpty(scene))
         {
-            Debug.Log($"Continuing from scene: {scene}");
+            Debug.Log($"Continuing from: {scene}");
             FadeManager.Instance.FadeToScene(scene);
         }
         else
         {
-            Debug.LogWarning("No saved scene found.");
+            Debug.LogWarning("No saved scene.");
         }
     }
 
-    // Call this every time a scene loads (called from FadeManager after load)
     public void SaveCurrentScene(string sceneName)
     {
         PlayerPrefs.SetString(KEY_CURRENT_SCENE, sceneName);
         PlayerPrefs.SetInt(KEY_HAS_SAVE, 1);
         PlayerPrefs.Save();
-        Debug.Log($"Saved current scene: {sceneName}");
+        Debug.Log($"Scene saved: {sceneName}");
     }
 
     public void SaveAll()
@@ -94,12 +92,11 @@ public class SaveManager : MonoBehaviour
         Debug.Log("Full save complete.");
     }
 
-    // ?? Inventory ?????????????????????????????????????????????
+    // ── Inventory ─────────────────────────────────────────────
 
     private void SaveInventory()
     {
         List<string> items = InventoryManager.Instance.GetItems();
-        // Store as semicolon-separated string
         PlayerPrefs.SetString(KEY_INVENTORY, string.Join(";", items));
     }
 
@@ -110,16 +107,15 @@ public class SaveManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(raw))
         {
-            string[] items = raw.Split(';');
-            foreach (string item in items)
+            foreach (string item in raw.Split(';'))
                 if (!string.IsNullOrEmpty(item))
                     InventoryManager.Instance.inventoryItems.Add(item);
         }
 
-        Debug.Log($"Loaded inventory: {raw}");
+        Debug.Log($"Inventory loaded: {raw}");
     }
 
-    // ?? Picked Up Objects ?????????????????????????????????????
+    // ── Picked Up ─────────────────────────────────────────────
 
     private void SavePickedUp()
     {
@@ -134,21 +130,21 @@ public class SaveManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(raw))
         {
-            string[] entries = raw.Split(';');
-            foreach (string entry in entries)
+            foreach (string entry in raw.Split(';'))
                 if (!string.IsNullOrEmpty(entry))
                     InventoryManager.Instance.RestorePickedUp(entry);
         }
 
-        Debug.Log($"Loaded picked up: {raw}");
+        Debug.Log($"Picked up loaded: {raw}");
     }
 
-    // ?? Diary ?????????????????????????????????????????????????
+    // ── Diary ─────────────────────────────────────────────────
 
     public void SaveDiaryState()
     {
         PlayerPrefs.SetInt(KEY_DIARY_UNLOCKED, FadeManager.Instance.IsDiaryUnlocked ? 1 : 0);
         PlayerPrefs.SetInt(KEY_DIARY_PAGE, FadeManager.Instance.CurrentDiaryPage);
+        PlayerPrefs.Save();
     }
 
     public void LoadDiaryState()
@@ -156,15 +152,16 @@ public class SaveManager : MonoBehaviour
         bool unlocked = PlayerPrefs.GetInt(KEY_DIARY_UNLOCKED, 0) == 1;
         int page = PlayerPrefs.GetInt(KEY_DIARY_PAGE, 0);
         FadeManager.Instance.RestoreDiaryState(unlocked, page);
-        Debug.Log($"Loaded diary � unlocked: {unlocked}, page: {page}");
+        Debug.Log($"Diary loaded — unlocked: {unlocked}, page: {page}");
     }
 
-    // ?? Unlocked Gates ????????????????????????????????????????
+    // ── Unlocked Gates ────────────────────────────────────────
 
     public void SaveUnlockedGates()
     {
         string raw = string.Join(";", SceneItemRequirement.GetUnlockedGates());
         PlayerPrefs.SetString(KEY_UNLOCKED_GATES, raw);
+        PlayerPrefs.Save();
     }
 
     public void LoadUnlockedGates()
@@ -174,12 +171,11 @@ public class SaveManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(raw))
         {
-            string[] gates = raw.Split(';');
-            foreach (string gate in gates)
+            foreach (string gate in raw.Split(';'))
                 if (!string.IsNullOrEmpty(gate))
                     SceneItemRequirement.RestoreUnlockedGate(gate);
         }
 
-        Debug.Log($"Loaded unlocked gates: {raw}");
+        Debug.Log($"Gates loaded: {raw}");
     }
 }

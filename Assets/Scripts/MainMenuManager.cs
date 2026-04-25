@@ -3,16 +3,13 @@ using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour
 {
-    [Header("Assign in Inspector")]
     public Button newGameButton;
     public Button continueButton;
-
-    // The first gameplay scene name
     public string firstSceneName = "Scene1";
 
     void Start()
     {
-        // Show continue only if save exists
+        // Grey out continue if no save exists
         if (continueButton != null)
             continueButton.interactable = SaveManager.Instance.HasSave();
 
@@ -22,13 +19,13 @@ public class MainMenuManager : MonoBehaviour
 
     private void OnNewGame()
     {
-        Debug.Log("New Game — wiping save data.");
+        Debug.Log("New Game.");
         SaveManager.Instance.NewGame(firstSceneName);
     }
 
     private void OnContinue()
     {
-        Debug.Log("Continue — loading saved game.");
+        Debug.Log("Continue.");
         SaveManager.Instance.ContinueGame();
     }
 }

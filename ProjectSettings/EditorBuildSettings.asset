@@ -24,6 +24,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Father's Room.unity
     guid: fa8e0497251621742af6dafe5855e743
   - enabled: 1
+    path: Assets/Scenes/Puzzle Box.unity
+    guid: aeb96554b0a4af24db32ab04beed3512
+  - enabled: 1
     path: Assets/Scenes/OpenBox.unity
     guid: e12135ade9170b54baf8aed014427d2a
   m_configObjects:

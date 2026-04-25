@@ -178,7 +178,7 @@ public class FadeManager : MonoBehaviour
         float scroll = Input.GetAxis("Mouse ScrollWheel");
 
         if (scroll > 0f)
-        {
+        {     
             selectedIndex = (selectedIndex - 1 + currentSlots.Count) % currentSlots.Count;
             UpdateSelectionVisual();
         }
