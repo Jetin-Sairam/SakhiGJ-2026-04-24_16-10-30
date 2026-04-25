@@ -1,19 +1,26 @@
-using Unity.VisualScripting;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-    private string SceneSwitch;
+    [System.Serializable]
+    public struct ItemVisual
+    {
+        public string name;
+        public Sprite icon;
+    }
+
+    public List<ItemVisual> itemDatabase;
     public float speed = 5f;
 
-    // The collider we're currently in contact with that can be interacted with
+    private string SceneSwitch;
     private Collider2D currentInteractable;
 
-    // Sprite renderer used to flip the sprite when changing direction
-    private SpriteRenderer spriteRenderer;
+    // Cached gate in the current scene (null if scene has no requirement)
+    private SceneItemRequirement sceneGate;
 
-    // True if the sprite is currently facing right (assumes default art faces right)
+    private SpriteRenderer spriteRenderer;
     private bool facingRight = true;
 
     void Awake()
@@ -21,124 +28,129 @@ public class PlayerController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
+    void Start()
+    {
+        FadeManager.Instance.RefreshInventory(itemDatabase);
+
+        // Check if this scene has a gate requirement
+        sceneGate = FindFirstObjectByType<SceneItemRequirement>();
+    }
+
     void Update()
     {
-        // Player movement controller
         if (Input.GetKey(KeyCode.A))
         {
             transform.Translate(Vector3.left * Time.deltaTime * speed);
-            // Face left
-            if (facingRight)
-            {
-                FlipToLeft();
-            }
+            if (facingRight) FlipToLeft();
         }
         else if (Input.GetKey(KeyCode.D))
         {
             transform.Translate(Vector3.right * Time.deltaTime * speed);
-            // Face right
-            if (!facingRight)
-            {
-                FlipToRight();
-            }
+            if (!facingRight) FlipToRight();
         }
 
-        // Run interaction only when player is still in contact and presses E (single press)
         if (currentInteractable != null && Input.GetKeyDown(KeyCode.E))
-        {
             PerformInteraction(currentInteractable);
-        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // If the thing we collided with is an interactable, cache it
         if (collision.gameObject.CompareTag("Scene") || collision.gameObject.CompareTag("Object"))
         {
             currentInteractable = collision;
-            Debug.Log($"Enter interactable: {collision.gameObject.tag}");
 
-            // If it's a Scene-tagged object, store its name for later scene switching
             if (collision.gameObject.CompareTag("Scene"))
-            {
                 SceneSwitch = collision.gameObject.name;
-                Debug.Log($"SceneSwitch set to: {SceneSwitch}");
-            }
+        }
+
+        // Player walks into the gate collider (a separate collider tagged "Gate")
+        if (collision.gameObject.CompareTag("Gate"))
+        {
+            currentInteractable = collision;
+            Debug.Log("At gate — press E to use selected item");
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        // Clear cached interactable when we leave it
         if (collision == currentInteractable)
+            currentInteractable = null;
+
+        if (collision.gameObject.CompareTag("Scene"))
+            if (SceneSwitch == collision.gameObject.name)
+                SceneSwitch = null;
+    }
+
+    private void PerformInteraction(Collider2D collider)
+    {
+        // --- Picking up an object ---
+        if (collider.CompareTag("Object"))
         {
-            Debug.Log($"Exit interactable: {collision.gameObject.tag}");
+            string objectName = collider.gameObject.name;
+            string sceneName = SceneManager.GetActiveScene().name;
+
+            InventoryManager.Instance.AddItem(objectName);
+            InventoryManager.Instance.MarkAsPickedUp(sceneName, objectName);
+
+            FadeManager.Instance.RefreshInventory(itemDatabase);
+            Destroy(collider.gameObject);
             currentInteractable = null;
         }
 
-        // If we exit a Scene object, clear SceneSwitch
-        if (collision.gameObject.CompareTag("Scene"))
+        // --- Interacting with a Gate ---
+        else if (collider.CompareTag("Gate"))
         {
-            // Only clear if the exiting object matches the stored name (optional safety)
-            if (SceneSwitch == collision.gameObject.name)
+            if (sceneGate == null) return;
+
+            // Already unlocked, nothing to do
+            if (sceneGate.IsUnlocked()) return;
+
+            string selected = FadeManager.Instance.GetSelectedItem();
+
+            if (selected == null)
             {
-                SceneSwitch = null;
-                Debug.Log("SceneSwitch cleared");
+                Debug.Log("No item selected. Use scroll wheel to select.");
+                return;
+            }
+
+            // Try to unlock — if correct, consume the item
+            bool success = sceneGate.TryUnlock(selected);
+            if (success)
+            {
+                FadeManager.Instance.ConsumeSelectedItem();
+                FadeManager.Instance.RefreshInventory(itemDatabase);
             }
         }
-    }
 
-    // Central place to put your custom interaction logic
-    private void PerformInteraction(Collider2D collider)
-    {
-        if (collider.CompareTag("Object"))
-        {
-            Debug.Log("Pickup");
-            Destroy(collider.gameObject); // example behavior for "Object"
-        }
+        // --- Normal scene switch ---
         else if (collider.CompareTag("Scene"))
         {
-            Debug.Log("Scene interaction triggered");
-            // Use SceneSwitch if needed:
             if (!string.IsNullOrEmpty(SceneSwitch))
-            {
-                Debug.Log($"Would load scene named '{SceneSwitch}'");
-                // Example: SceneManager.LoadScene(SceneSwitch);
-            }
+                FadeManager.Instance.FadeToScene(SceneSwitch);
         }
     }
 
     private void FlipToLeft()
     {
-        if (spriteRenderer != null)
-        {
-            // Assumes default sprite faces right; flipX true makes it face left
-            spriteRenderer.flipX = true;
-        }
+        if (spriteRenderer != null) spriteRenderer.flipX = true;
         else
         {
-            // Fallback: invert localScale X if no SpriteRenderer found
             Vector3 s = transform.localScale;
             s.x = -Mathf.Abs(s.x);
             transform.localScale = s;
         }
-
         facingRight = false;
     }
 
     private void FlipToRight()
     {
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.flipX = false;
-        }
+        if (spriteRenderer != null) spriteRenderer.flipX = false;
         else
         {
             Vector3 s = transform.localScale;
             s.x = Mathf.Abs(s.x);
             transform.localScale = s;
         }
-
         facingRight = true;
     }
 }
