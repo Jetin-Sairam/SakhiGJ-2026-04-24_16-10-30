@@ -1,20 +1,26 @@
+using System.Collections;
 using UnityEngine;
 
 public class DiaryUnlocker : MonoBehaviour
 {
     private bool triggered = false;
 
-    // Called by PlayerController when E is pressed on this object
     public void Unlock()
     {
         if (triggered) return;
         triggered = true;
+        StartCoroutine(UnlockRoutine());
+    }
 
-        FadeManager.Instance.UnlockDiary();
-        Debug.Log("Diary unlocked by interacting with: " + gameObject.name);
+    private IEnumerator UnlockRoutine()
+    {
+        Debug.Log("Diary unlocked — Press R To Toggle Diary");
+        yield return new WaitForSeconds(5f);
 
-        // Optional: fade out this object so player knows it was used
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         if (sr != null) sr.color = new Color(1, 1, 1, 0.2f);
+
+        FadeManager.Instance.UnlockDiary();
+        Debug.Log("Diary is now available.");
     }
 }

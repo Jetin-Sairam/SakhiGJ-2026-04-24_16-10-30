@@ -999,7 +999,7 @@ GameObject:
   - component: {fileID: 2019659384}
   - component: {fileID: 2019659385}
   m_Layer: 0
-  m_Name: Final Safe Key
+  m_Name: Safe Key
   m_TagString: Object
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

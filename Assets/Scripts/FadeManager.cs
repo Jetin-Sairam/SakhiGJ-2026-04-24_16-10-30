@@ -137,14 +137,14 @@ public class FadeManager : MonoBehaviour
         diaryOpen = true;
         if (diaryPanel != null) diaryPanel.SetActive(true);
         RefreshDiaryPage();
-        Debug.Log("Diary opened.");
+        Debug.Log("Press R to Toggle Diary");
     }
 
     public void CloseDiary()
     {
         diaryOpen = false;
         if (diaryPanel != null) diaryPanel.SetActive(false);
-        Debug.Log("Diary closed.");
+        Debug.Log("Press R to Toggle Diary");
     }
 
     private void RefreshDiaryPage()
@@ -274,6 +274,7 @@ public class FadeManager : MonoBehaviour
         if (previewImage != null) { previewImage.sprite = sprite; previewImage.preserveAspect = true; }
         if (previewText != null) previewText.text = desc ?? "";
         if (previewPanel != null) previewPanel.SetActive(true);
+        Debug.Log($"Press Q to Close");
     }
 
     public void HidePreview()

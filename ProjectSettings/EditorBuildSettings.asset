@@ -29,6 +29,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/OpenBox.unity
     guid: e12135ade9170b54baf8aed014427d2a
+  - enabled: 1
+    path: Assets/Scenes/Uncle's House.unity
+    guid: e4b61a83094c291479dc0d7eb10403fe
+  - enabled: 1
+    path: Assets/Scenes/Hideout.unity
+    guid: f27f9ed80249b4f4a88fb110132aab32
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

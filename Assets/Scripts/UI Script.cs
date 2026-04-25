@@ -1,17 +1,26 @@
-using TMPro;
 using UnityEngine;
-using UnityEngine.UIElements;
+using TMPro;
 
-public class UIScript : MonoBehaviour
+public class DebugDisplay : MonoBehaviour
 {
-    public TextMeshProUGUI Objectives;
-    void Start()
+    public TextMeshProUGUI debugText;
+
+    void OnEnable()
     {
-        
+        Application.logMessageReceived += HandleLog;
     }
 
-    void Update()
+    void OnDisable()
     {
-        
+        Application.logMessageReceived -= HandleLog;
+    }
+
+    private void HandleLog(string message, string stackTrace, LogType type)
+    {
+        if (type != LogType.Log) return;
+
+        // Every new log just replaces the previous text
+        if (debugText != null)
+            debugText.text = message;
     }
 }

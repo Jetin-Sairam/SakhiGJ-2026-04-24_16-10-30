@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 public class PlayerController : MonoBehaviour
 {
     public float speed = 5f;
-    public float interactClipLength = 0.5f; // Set this to your Interact clip length
+    public float interactClipLength = 0.5f;
 
     private string SceneSwitch;
     private Collider2D currentInteractable;
@@ -15,6 +15,8 @@ public class PlayerController : MonoBehaviour
     private Animator animator;
     private bool facingRight = true;
     private bool isInteracting = false;
+
+    public GameObject key;
 
     void Awake()
     {
@@ -28,11 +30,26 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         FadeManager.Instance.RefreshInventory();
+
+        // Make sure key starts hidden and non-interactable
+        if (key != null)
+        {
+            SpriteRenderer keyRenderer = key.GetComponent<SpriteRenderer>();
+            if (keyRenderer != null)
+            {
+                Color c = keyRenderer.color;
+                c.a = 0f;
+                keyRenderer.color = c;
+            }
+
+            Collider2D keyCol = key.GetComponent<Collider2D>();
+            if (keyCol != null)
+                keyCol.enabled = false;
+        }
     }
 
     void Update()
     {
-        // Diary open — only R closes it, block everything else
         if (FadeManager.Instance != null && FadeManager.Instance.IsDiaryOpen)
         {
             if (Input.GetKeyDown(KeyCode.R))
@@ -40,10 +57,8 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // Block all input while interact animation plays
         if (isInteracting) return;
 
-        // Movement
         if (Input.GetKey(KeyCode.A))
         {
             transform.Translate(Vector3.left * Time.deltaTime * speed);
@@ -61,18 +76,15 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("isWalking", false);
         }
 
-        // Interact
         if (currentInteractable != null && Input.GetKeyDown(KeyCode.E))
             PerformInteraction(currentInteractable);
 
-        // Preview selected item
         if (Input.GetKeyDown(KeyCode.Q))
         {
             if (FadeManager.Instance != null)
                 FadeManager.Instance.TogglePreview();
         }
 
-        // Toggle diary
         if (Input.GetKeyDown(KeyCode.R))
         {
             if (FadeManager.Instance != null)
@@ -92,7 +104,7 @@ public class PlayerController : MonoBehaviour
                 color.a = 0.5f;
                 targetRenderer.color = color;
             }
-            Debug.Log($"Near pickup: {collision.gameObject.name}");
+            Debug.Log($"Press E to pick up {collision.gameObject.name}");
         }
         else if (collision.gameObject.CompareTag("Scene"))
         {
@@ -109,27 +121,29 @@ public class PlayerController : MonoBehaviour
 
             if (sceneGate == null)
                 Debug.LogWarning($"Scene trigger '{SceneSwitch}' has no SceneItemRequirement.");
+            else if (sceneGate.IsNoItemRequired())
+                Debug.Log($"{SceneSwitch}");
             else
-                Debug.Log($"Near scene trigger: {SceneSwitch} (requires: '{sceneGate.GetRequiredItem()}')");
+                Debug.Log($"{SceneSwitch} requires '{sceneGate.GetRequiredItem()}'");
         }
         else if (collision.gameObject.CompareTag("Task"))
         {
+            // *** THIS WAS MISSING — must set currentInteractable ***
+            currentInteractable = collision;
+
             SpriteRenderer targetRenderer = collision.gameObject.GetComponent<SpriteRenderer>();
             if (targetRenderer != null)
             {
                 Color color = targetRenderer.color;
-                color.a = 0.15f;
+                color.a = 0.95f;
                 targetRenderer.color = color;
             }
-            Debug.Log("Task triggered");
+            Debug.Log("Press E to Interact");
         }
         else if (collision.gameObject.CompareTag("Diary"))
         {
             currentInteractable = collision;
             diaryUnlocker = collision.gameObject.GetComponent<DiaryUnlocker>();
-
-            // ADD THIS LINE
-            Debug.Log($"DiaryUnlocker component found: {diaryUnlocker != null}");
 
             SpriteRenderer targetRenderer = collision.gameObject.GetComponent<SpriteRenderer>();
             if (targetRenderer != null)
@@ -138,7 +152,7 @@ public class PlayerController : MonoBehaviour
                 color.a = 0.5f;
                 targetRenderer.color = color;
             }
-            Debug.Log("Near diary object — press E to unlock.");
+            Debug.Log("Press E to unlock Diary.");
         }
     }
 
@@ -154,7 +168,7 @@ public class PlayerController : MonoBehaviour
                 color.a = 1f;
                 targetRenderer.color = color;
             }
-            Debug.Log("Left interactable");
+            Debug.Log(" ");
         }
 
         if (collision.gameObject.CompareTag("Scene"))
@@ -198,26 +212,81 @@ public class PlayerController : MonoBehaviour
             currentInteractable = null;
 
             StartCoroutine(PlayInteractAnimation());
-            Debug.Log($"Picked up: {objectName}");
+            Debug.Log($"Picked up '{objectName}' — Scroll to select, Q to preview");
+            return;
+        }
+
+        // --- Task interaction ---
+        if (collider.CompareTag("Task"))
+        {
+            if (!InventoryManager.Instance.GetItems().Contains("Letter"))
+            {
+                Debug.Log("I Should Check if I find any mails");
+                return;
+            }
+            Debug.Log("Task interaction fired!");
+
+            // Hide the task object
+            SpriteRenderer taskRenderer = collider.gameObject.GetComponent<SpriteRenderer>();
+            if (taskRenderer != null)
+            {
+                Color c = taskRenderer.color;
+                c.a = 0f;
+                taskRenderer.color = c;
+                Debug.Log("Task sprite hidden.");
+            }
+            else
+            {
+                Debug.LogWarning("Task has no SpriteRenderer!");
+            }
+
+            // Disable task collider
+            collider.gameObject.SetActive(false);
+
+            // Reveal and enable the key
+            if (key != null)
+            {
+                SpriteRenderer keyRenderer = key.GetComponent<SpriteRenderer>();
+                if (keyRenderer != null)
+                {
+                    Color c = keyRenderer.color;
+                    c.a = 1f;
+                    keyRenderer.color = c;
+                    Debug.Log("Key revealed.");
+                }
+                else
+                {
+                    Debug.LogWarning("Key has no SpriteRenderer!");
+                }
+
+                Collider2D keyCol = key.GetComponent<Collider2D>();
+                if (keyCol != null)
+                {
+                    keyCol.enabled = true;
+                    Debug.Log("Key collider enabled.");
+                }
+                else
+                {
+                    Debug.LogWarning("Key has no Collider2D!");
+                }
+            }
+            else
+            {
+                Debug.LogError("Key GameObject is not assigned in PlayerController Inspector!");
+            }
+
+            currentInteractable = null;
             return;
         }
 
         // --- Diary unlock ---
         if (collider.CompareTag("Diary"))
         {
-            // ADD THESE LINES
-            Debug.Log($"E pressed on Diary — diaryUnlocker is null: {diaryUnlocker == null}");
-            Debug.Log($"FadeManager diary unlocked state: {FadeManager.Instance.IsDiaryUnlocked}");
-
-            if (diaryUnlocker != null)
-            {
-                diaryUnlocker.Unlock();
-                Debug.Log("Diary unlock triggered.");
-            }
+            DiaryUnlocker unlocker = collider.gameObject.GetComponent<DiaryUnlocker>();
+            if (unlocker != null)
+                unlocker.Unlock();
             else
-            {
-                Debug.LogError("diaryUnlocker is NULL — DiaryUnlocker.cs not attached to the Diary GameObject!");
-            }
+                Debug.LogError("No DiaryUnlocker component on Diary object!");
             return;
         }
 
@@ -232,32 +301,28 @@ public class PlayerController : MonoBehaviour
 
             if (sceneGate == null)
             {
-                Debug.Log("No gate — loading scene freely.");
                 FadeManager.Instance.FadeToScene(SceneSwitch);
                 return;
             }
 
             if (sceneGate.IsUnlocked())
             {
-                Debug.Log("Gate already unlocked — loading scene.");
                 FadeManager.Instance.FadeToScene(SceneSwitch);
                 return;
             }
 
             if (sceneGate.IsNoItemRequired())
             {
-                Debug.Log("Gate requires no item — unlocking and loading.");
                 sceneGate.ForceUnlock();
                 FadeManager.Instance.FadeToScene(SceneSwitch);
                 return;
             }
 
             string selected = FadeManager.Instance.GetSelectedItem();
-            Debug.Log($"Gate requires '{sceneGate.GetRequiredItem()}', selected: '{selected}'");
 
             if (selected == null)
             {
-                Debug.Log("No item selected. Use scroll wheel.");
+                Debug.Log("No item selected");
                 return;
             }
 
@@ -265,12 +330,11 @@ public class PlayerController : MonoBehaviour
             {
                 sceneGate.ForceUnlock();
                 FadeManager.Instance.ConsumeSelectedItem();
-                Debug.Log("Correct item — loading scene.");
                 FadeManager.Instance.FadeToScene(SceneSwitch);
             }
             else
             {
-                Debug.Log($"Wrong item. Need '{sceneGate.GetRequiredItem()}', have '{selected}'.");
+                Debug.Log($"{SceneSwitch} requires '{sceneGate.GetRequiredItem()}'");
             }
         }
     }
@@ -282,33 +346,21 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("isWalking", false);
         animator.SetBool("isInteracting", true);
 
-        // Wait a few frames for animator to react
         yield return null;
         yield return null;
         yield return null;
 
-        // Read clip length from current state — no name check
         AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
         float length = state.length;
 
-        // If animator didn't switch, fall back to inspector value
         if (length < 0.05f)
-        {
-            Debug.LogWarning($"Clip length too small ({length}s) — using interactClipLength: {interactClipLength}s");
             length = interactClipLength;
-        }
-        else
-        {
-            Debug.Log($"Interact clip length: {length}s");
-        }
 
         yield return new WaitForSeconds(length);
 
         animator.SetBool("isInteracting", false);
         animator.SetBool("isWalking", false);
         isInteracting = false;
-
-        Debug.Log("Interact animation done — back to idle.");
     }
 
     private void FlipToLeft()

@@ -20,7 +20,7 @@ public class MainMenuManager : MonoBehaviour
     public void OnNewGame()
     {
         Debug.Log("New Game.");
-        SaveManager.Instance.NewGame(firstSceneName);
+        SaveManager.Instance.NewGame("House");
     }
 
     public void OnContinue()

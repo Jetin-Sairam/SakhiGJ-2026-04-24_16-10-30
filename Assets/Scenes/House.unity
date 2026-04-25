@@ -136,7 +136,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &20499231
 RectTransform:
   m_ObjectHideFlags: 0
@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.92156863}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -329,7 +329,7 @@ Transform:
   m_GameObject: {fileID: 110880342}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.7782, y: -0.1472, z: 0}
+  m_LocalPosition: {x: 7.77, y: -0.1472, z: 0}
   m_LocalScale: {x: 1.4998586, y: 3.666843, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -520,7 +520,7 @@ MonoBehaviour:
   inventoryPanel: {fileID: 8038249712237971175}
   slotPrefab: {fileID: 2778498991175196358, guid: 42fecf50f35f0044f8e98c220a9a0884, type: 3}
   fadeDuration: 1
-  selectedColor: {r: 0.6317194, g: 0.69706404, b: 0.735849, a: 1}
+  selectedColor: {r: 1, g: 0.9445061, b: 0.2924527, a: 1}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   previewPanel: {fileID: 20499230}
   previewImage: {fileID: 1430064788}
@@ -581,7 +581,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 21, y: -28}
+  m_AnchoredPosition: {x: 21, y: -16}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &432791410
@@ -618,7 +618,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: use A & D to  move
+  m_text: Use  A & D  to  Move,  E to Interact
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2259e91a3329fda4580fcf95839e8e38, type: 2}
   m_sharedMaterial: {fileID: -1541084993453063787, guid: 2259e91a3329fda4580fcf95839e8e38, type: 2}
@@ -627,8 +627,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -645,8 +645,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -872,7 +872,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 178, y: 89}
-  m_SizeDelta: {x: 146.9, y: 40.22}
+  m_SizeDelta: {x: 164.66, y: 43.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &611632230
 MonoBehaviour:
@@ -918,15 +918,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2259e91a3329fda4580fcf95839e8e38, type: 2}
+  m_sharedMaterial: {fileID: -1541084993453063787, guid: 2259e91a3329fda4580fcf95839e8e38, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1109,9 +1109,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryManager
   itemDatabase:
-  - name: Fathers Room Key
+  - name: Room Key
     icon: {fileID: 21300000, guid: fbf60069cc2fe3741a2d6bdc49869901, type: 3}
-    description: 
+    description: A Rusted Room key That unlocks the door to the Father's Room
   - name: Letter
     icon: {fileID: -4181906289457810447, guid: 48dfbf43e9f7edc4386aa39f73bb4e33, type: 3}
     description: "To \nMy dear daughter,\nI never thought this would be our last
@@ -1122,9 +1122,10 @@ MonoBehaviour:
       little one used to play all day in the garden. Now, let that garden be what
       helps you move forward in your life. It is hard to end this letter, but my
       hand can no longer move forward. I hope you understand.\nTake care, my girl.\nYours,\nDad"
-  - name: Final Safe Key
+  - name: Safe Key
     icon: {fileID: -2091691298951779074, guid: 4f839aa948c7c0c449339bf02574228e, type: 3}
-    description: 
+    description: 'The Mysterious Safe key , Doesnt seem to fit in any of the key
+      holes in the house '
   inventoryItems: []
 --- !u!4 &758964185
 Transform:
@@ -1428,7 +1429,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: -120, y: 0.0000019073486}
-  m_SizeDelta: {x: 281.018, y: 0}
+  m_SizeDelta: {x: 281.018, y: 15.61}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!1 &1134367669
 GameObject:
@@ -1563,7 +1564,7 @@ Transform:
   m_GameObject: {fileID: 1134367669}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.611, y: -0.157, z: 0}
+  m_LocalPosition: {x: -7.63, y: -0.157, z: 0}
   m_LocalScale: {x: 1.5211359, y: 3.6869442, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1904,7 +1905,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abfb7261fd12e3f49915d6818aae19a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneItemRequirement
-  requiredItem: Fathers Room Key
+  requiredItem: Room Key
   hintText: {fileID: 0}
 --- !u!1 &1430064785
 GameObject:
@@ -2388,15 +2389,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2259e91a3329fda4580fcf95839e8e38, type: 2}
+  m_sharedMaterial: {fileID: -1541084993453063787, guid: 2259e91a3329fda4580fcf95839e8e38, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -2494,11 +2495,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1693128030}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -191, y: 56}
-  m_SizeDelta: {x: 146.9, y: 40.22}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 135, y: 0.0000038146973}
+  m_SizeDelta: {x: 164.66, y: 43.2}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!223 &94127590173723904
 Canvas:
   m_ObjectHideFlags: 0
@@ -2531,6 +2532,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4832101286094102178}
+  - component: {fileID: 8902843596799338831}
   - component: {fileID: 94127590173723904}
   - component: {fileID: 8902843596799338830}
   - component: {fileID: 3143061116728004375}
@@ -2585,11 +2587,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 4832101286094102178}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 609.2173, y: 75.527}
-  m_Pivot: {x: 0.5, y: 1}
+  m_SizeDelta: {x: 609.2173, y: 75.52701}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &3143061116728004375
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2666,29 +2668,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1560746058278446951, guid: 3b9eb04d93658a24d9ee9b55297cff78, type: 3}
-      insertIndex: 4
-      addedObject: {fileID: 3753996302446726936}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3b9eb04d93658a24d9ee9b55297cff78, type: 3}
---- !u!1 &3753996302446726935 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1560746058278446951, guid: 3b9eb04d93658a24d9ee9b55297cff78, type: 3}
-  m_PrefabInstance: {fileID: 3753996302446726934}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &3753996302446726936
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3753996302446726935}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c7be6b0a2d3c9b48b635383208e2e0b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UIScript
-  Objectives: {fileID: 0}
 --- !u!224 &4832101286094102178
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2789,6 +2770,19 @@ MonoBehaviour:
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
   m_PresetInfoIsWorld: 0
+--- !u!114 &8902843596799338831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2072734000219993922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c7be6b0a2d3c9b48b635383208e2e0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DebugDisplay
+  debugText: {fileID: 432791411}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

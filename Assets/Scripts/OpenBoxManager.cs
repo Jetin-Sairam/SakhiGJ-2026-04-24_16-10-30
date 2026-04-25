@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,16 +14,22 @@ public class OpenBoxManager : MonoBehaviour
 
             if (!FadeManager.Instance.IsDiaryUnlocked)
             {
-                // Unlock the diary when E is pressed in this scene
                 FadeManager.Instance.UnlockDiary();
-                Debug.Log("OpenBoxManager: Diary unlocked!");
+                Debug.Log("Diary unlocked — Press R To Toggle Diary");
                 hasUnlockedDiary = true;
-                SceneManager.LoadScene("Father's Room");
+
+                StartCoroutine(LoadSceneAfterDelay());
             }
             else
             {
                 FadeManager.Instance.ToggleDiary();
             }
         }
+    }
+
+    private IEnumerator LoadSceneAfterDelay()
+    {
+        yield return new WaitForSeconds(5f);
+        SceneManager.LoadScene("Father's Room");
     }
 }

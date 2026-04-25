@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -5,31 +6,42 @@ using UnityEngine.SceneManagement;
 public class Puzzle : MonoBehaviour
 {
     public List<GameObject> puzzlePieces;
-
-    // How close to 0/360 degrees counts as "solved" for each piece
     public float angleTolerance = 5f;
 
     private int pieceIndex = 0;
+    private int previousIndex = 0;
+    private bool puzzleSolved = false;
+
+    void Start()
+    {
+        Debug.Log("Puzzle: Use W/S to select pieces, A/D to rotate.");
+        SetAlpha(puzzlePieces[pieceIndex], 0.9f);
+    }
 
     void Update()
     {
-        // Select which piece to rotate
+        // Stop input once puzzle is solved
+        if (puzzleSolved) return;
+
         if (Input.GetKeyDown(KeyCode.W))
         {
             if (pieceIndex < puzzlePieces.Count - 1)
+            {
+                previousIndex = pieceIndex;
                 pieceIndex++;
-
-            Debug.Log($"Selected piece: {pieceIndex}");
+                UpdateSelectionAlpha();
+            }
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
             if (pieceIndex > 0)
+            {
+                previousIndex = pieceIndex;
                 pieceIndex--;
-
-            Debug.Log($"Selected piece: {pieceIndex}");
+                UpdateSelectionAlpha();
+            }
         }
 
-        // Rotate selected piece
         if (Input.GetKeyDown(KeyCode.A))
             puzzlePieces[pieceIndex].transform.Rotate(0, 0, -10);
         else if (Input.GetKeyDown(KeyCode.D))
@@ -38,29 +50,46 @@ public class Puzzle : MonoBehaviour
         CheckPuzzle();
     }
 
+    private void UpdateSelectionAlpha()
+    {
+        SetAlpha(puzzlePieces[previousIndex], 1f);
+        SetAlpha(puzzlePieces[pieceIndex], 0.75f);
+    }
+
+    private void SetAlpha(GameObject obj, float alpha)
+    {
+        SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            Color c = sr.color;
+            c.a = alpha;
+            sr.color = c;
+        }
+    }
+
     public void CheckPuzzle()
     {
         int solvedCount = 0;
 
         foreach (GameObject piece in puzzlePieces)
         {
-            // eulerAngles.z gives degrees (0–360), not a Quaternion component
             float angle = piece.transform.eulerAngles.z;
-
-            // Normalize: Unity eulerAngles returns 0–360
-            // Check if close to 0 or 360 (same position)
             bool atZero = angle <= angleTolerance || angle >= (360f - angleTolerance);
-
-            Debug.Log($"{piece.name} eulerAngle.z: {angle} — solved: {atZero}");
-
             if (atZero)
                 solvedCount++;
         }
 
         if (solvedCount == puzzlePieces.Count)
         {
+            puzzleSolved = true;
             Debug.Log("Puzzle Solved!");
-            SceneManager.LoadScene("OpenBox");
+            StartCoroutine(LoadSceneAfterDelay());
         }
+    }
+
+    private IEnumerator LoadSceneAfterDelay()
+    {
+        yield return new WaitForSeconds(5f);
+        SceneManager.LoadScene("OpenBox");
     }
 }
