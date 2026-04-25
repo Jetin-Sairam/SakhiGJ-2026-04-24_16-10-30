@@ -1,58 +1,71 @@
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class SceneItemRequirement : MonoBehaviour
 {
-    [Header("Which item name unlocks this scene trigger?")]
+    [Header("Set to 'Empty' or leave blank for no requirement")]
     public string requiredItem;
 
-    [Header("The Scene-tagged collider that is locked")]
-    public Collider2D lockedSceneTrigger;
-
-    [Header("Optional: UI text to show hint")]
+    [Header("Optional hint UI")]
     public UnityEngine.UI.Text hintText;
 
     private bool unlocked = false;
 
+    // Static registry — tracks all unlocked gates by scene/name key
+    private static HashSet<string> unlockedGates = new HashSet<string>();
+
+    private string GateKey => $"{UnityEngine.SceneManagement.SceneManager.GetActiveScene().name}/{gameObject.name}";
+
     void Start()
     {
-        // Lock the trigger initially
-        if (lockedSceneTrigger != null)
-            lockedSceneTrigger.enabled = false;
+        // Restore from static registry (populated by SaveManager on load)
+        if (unlockedGates.Contains(GateKey))
+            unlocked = true;
 
-        if (hintText != null)
-            hintText.text = $"You need the {requiredItem} to proceed.";
+        if (IsNoItemRequired())
+            unlocked = true;
+
+        UpdateHint();
     }
 
-    // Called by PlayerController when E is pressed on this gate
     public bool TryUnlock(string selectedItem)
     {
         if (unlocked) return true;
+        if (IsNoItemRequired()) { ForceUnlock(); return true; }
+        if (selectedItem == requiredItem) { ForceUnlock(); return true; }
+        return false;
+    }
 
-        if (selectedItem == requiredItem)
-        {
-            unlocked = true;
-
-            // Enable the scene trigger so player can now enter it
-            if (lockedSceneTrigger != null)
-                lockedSceneTrigger.enabled = true;
-
-            if (hintText != null)
-                hintText.text = "Unlocked!";
-
-            Debug.Log($"Gate unlocked with {selectedItem}!");
-            return true;
-        }
-        else
-        {
-            Debug.Log($"Wrong item. Need {requiredItem}, have {selectedItem}");
-
-            if (hintText != null)
-                hintText.text = $"You need the {requiredItem} to proceed.";
-
-            return false;
-        }
+    public void ForceUnlock()
+    {
+        unlocked = true;
+        unlockedGates.Add(GateKey);
+        UpdateHint();
+        SaveManager.Instance?.SaveUnlockedGates();
+        Debug.Log($"Gate unlocked: {GateKey}");
     }
 
     public bool IsUnlocked() => unlocked;
     public string GetRequiredItem() => requiredItem;
+
+    public bool IsNoItemRequired()
+    {
+        return string.IsNullOrWhiteSpace(requiredItem) ||
+               requiredItem.Trim().ToLower() == "empty";
+    }
+
+    private void UpdateHint()
+    {
+        if (hintText == null) return;
+        if (IsNoItemRequired()) hintText.text = "";
+        else hintText.text = unlocked ? "Unlocked!" : $"Requires: {requiredItem}";
+    }
+
+    // ── Static save/load helpers used by SaveManager ──────────
+
+    public static HashSet<string> GetUnlockedGates() => unlockedGates;
+
+    public static void ClearUnlockedGates() => unlockedGates.Clear();
+
+    public static void RestoreUnlockedGate(string key) => unlockedGates.Add(key);
 }

@@ -1,15 +1,24 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager Instance { get; private set; }
 
-    public List<string> inventoryItems = new List<string>();
-    private HashSet<string> pickedUpObjects = new HashSet<string>();
+    [System.Serializable]
+    public struct ItemVisual
+    {
+        public string name;
+        public Sprite icon;
+        [TextArea(2, 6)]
+        public string description;
+    }
 
-    // Currently selected inventory index
-    public int selectedIndex = 0;
+    public List<ItemVisual> itemDatabase = new List<ItemVisual>();
+    public List<string> inventoryItems = new List<string>();
+
+    private HashSet<string> pickedUpObjects = new HashSet<string>();
 
     void Awake()
     {
@@ -26,29 +35,11 @@ public class InventoryManager : MonoBehaviour
     public void AddItem(string itemName)
     {
         inventoryItems.Add(itemName);
-    }
+        Debug.Log($"InventoryManager: added '{itemName}'. Total: {inventoryItems.Count}");
 
-    public void RemoveItemAt(int index)
-    {
-        if (index < 0 || index >= inventoryItems.Count) return;
-        inventoryItems.RemoveAt(index);
-
-        // Clamp selected index so it doesn't go out of range
-        selectedIndex = Mathf.Clamp(selectedIndex, 0, Mathf.Max(0, inventoryItems.Count - 1));
-    }
-
-    public string GetSelectedItem()
-    {
-        if (inventoryItems.Count == 0) return null;
-        return inventoryItems[selectedIndex];
-    }
-
-    public void ScrollSelection(int direction)
-    {
-        if (inventoryItems.Count == 0) return;
-
-        // Wrap around
-        selectedIndex = (selectedIndex + direction + inventoryItems.Count) % inventoryItems.Count;
+        // Auto-save whenever inventory changes
+        if (SaveManager.Instance != null)
+            SaveManager.Instance.SaveAll();
     }
 
     public List<string> GetItems() => inventoryItems;
@@ -61,5 +52,30 @@ public class InventoryManager : MonoBehaviour
     public bool WasPickedUp(string sceneName, string objectName)
     {
         return pickedUpObjects.Contains(sceneName + "/" + objectName);
+    }
+
+    // For SaveManager
+    public HashSet<string> GetPickedUpSet() => pickedUpObjects;
+
+    public void ClearPickedUp() => pickedUpObjects.Clear();
+
+    public void RestorePickedUp(string entry) => pickedUpObjects.Add(entry);
+
+    public Sprite GetSprite(string itemName)
+    {
+        foreach (var item in itemDatabase)
+            if (item.name == itemName)
+                return item.icon;
+
+        Debug.LogWarning($"InventoryManager: No sprite found for '{itemName}'.");
+        return null;
+    }
+
+    public string GetDescription(string itemName)
+    {
+        foreach (var item in itemDatabase)
+            if (item.name == itemName)
+                return item.description;
+        return null;
     }
 }
