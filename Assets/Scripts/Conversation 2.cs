@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ConversationTrigger1 : MonoBehaviour
 {
@@ -33,5 +34,8 @@ public class ConversationTrigger1 : MonoBehaviour
 
         yield return new WaitForSeconds(2f);
         Debug.Log("UNCLE KABIR : Its just a matter of time");
+
+        yield return new WaitForSeconds(2f);
+        SceneManager.LoadScene("ToBeContinued");
     }
 }

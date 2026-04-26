@@ -48,6 +48,10 @@ public class SaveManager : MonoBehaviour
         FadeManager.Instance.FadeToScene(firstSceneName);
     }
 
+    public void ResetPrefs()
+    {
+        PlayerPrefs.DeleteAll(); PlayerPrefs.Save(); Debug.Log("All PlayerPrefs reset.");
+    }
     public void ContinueGame()
     {
         if (!HasSave())
