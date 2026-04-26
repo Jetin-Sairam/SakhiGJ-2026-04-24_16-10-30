@@ -3,10 +3,26 @@ using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour
 {
+    // Singleton instance so other scripts can call MainMenuManager.Instance
+    public static MainMenuManager Instance { get; private set; }
+
     public Button newGameButton;
     public Button continueButton;
     public string firstSceneName = "House";
     public GameObject MenuPanel;
+
+    void Awake()
+    {
+        // Ensure single instance
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        // Do NOT call DontDestroyOnLoad here unless you want the main menu to persist between scenes.
+    }
 
     void Start()
     {

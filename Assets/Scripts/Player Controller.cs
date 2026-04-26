@@ -195,7 +195,7 @@ public class PlayerController : MonoBehaviour
             if (sceneGate == null)
                 Debug.LogWarning($"Scene trigger '{SceneSwitch}' has no SceneItemRequirement.");
             else if (sceneGate.IsNoItemRequired())
-                Debug.Log($"{SceneSwitch}");
+                Debug.Log($"{SceneSwitch} (E)");
             else
                 Debug.Log($"{SceneSwitch} requires '{sceneGate.GetRequiredItem()}'");
         }
@@ -288,7 +288,7 @@ public class PlayerController : MonoBehaviour
         {
             if (!InventoryManager.Instance.GetItems().Contains("Letter"))
             {
-                Debug.Log("I Should Check if I find any mails");
+                Debug.Log("Someone seems to be knocking at the door.");
                 return;
             }
 
@@ -366,7 +366,7 @@ public class PlayerController : MonoBehaviour
 
             if (selected == null)
             {
-                Debug.Log("No item selected");
+                Debug.Log("No item selected, Scroll to Select");
                 return;
             }
 

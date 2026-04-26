@@ -86,6 +86,6 @@ public class EnemySpawner : MonoBehaviour
             Debug.LogError("Enemy prefab has no EnemyAI component!");
         }
 
-        Debug.Log($"Spawned {enemy.name} at {spawnPoint.name}");
+        
     }
 }
