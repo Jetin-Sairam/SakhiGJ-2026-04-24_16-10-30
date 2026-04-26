@@ -7,14 +7,14 @@ public class PlayerController : MonoBehaviour
     public float speed = 5f;
     public float interactClipLength = 0.5f;
 
-    // --- Punch settings (single-hit kill) ---
     [Header("Punch")]
     public KeyCode punchKey = KeyCode.Space;
-    public float punchRange = 0.6f;           // radius of the punch hit area
-    public float punchOffset = 0.6f;          // how far in front of the player to check
-    public float punchCooldown = 0.5f;        // minimum time between punches
-    public float punchHitDelay = 0.05f;       // small delay to sync with animation (optional)
+    public float punchRange = 0.6f;
+    public float punchOffset = 0.6f;
+    public float punchCooldown = 0.5f;
+    public float punchHitDelay = 0.05f;
     private float lastPunchTime = -999f;
+    private bool isPunching = false;
 
     private string SceneSwitch;
     private Collider2D currentInteractable;
@@ -40,7 +40,6 @@ public class PlayerController : MonoBehaviour
     {
         FadeManager.Instance.RefreshInventory();
 
-        // Make sure key starts hidden and non-interactable
         if (key != null)
         {
             SpriteRenderer keyRenderer = key.GetComponent<SpriteRenderer>();
@@ -68,25 +67,28 @@ public class PlayerController : MonoBehaviour
 
         if (isInteracting) return;
 
-        // Movement
-        if (Input.GetKey(KeyCode.A))
+        // Movement — blocked while punching
+        if (!isPunching)
         {
-            transform.Translate(Vector3.left * Time.deltaTime * speed);
-            if (facingRight) FlipToLeft();
-            animator.SetBool("isWalking", true);
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            transform.Translate(Vector3.right * Time.deltaTime * speed);
-            if (!facingRight) FlipToRight();
-            animator.SetBool("isWalking", true);
-        }
-        else
-        {
-            animator.SetBool("isWalking", false);
+            if (Input.GetKey(KeyCode.A))
+            {
+                transform.Translate(Vector3.left * Time.deltaTime * speed);
+                if (facingRight) FlipToLeft();
+                animator.SetBool("isWalking", true);
+            }
+            else if (Input.GetKey(KeyCode.D))
+            {
+                transform.Translate(Vector3.right * Time.deltaTime * speed);
+                if (!facingRight) FlipToRight();
+                animator.SetBool("isWalking", true);
+            }
+            else
+            {
+                animator.SetBool("isWalking", false);
+            }
         }
 
-        // Interact / Scene
+        // Interact
         if (currentInteractable != null && Input.GetKeyDown(KeyCode.E))
             PerformInteraction(currentInteractable);
 
@@ -104,8 +106,8 @@ public class PlayerController : MonoBehaviour
                 FadeManager.Instance.ToggleDiary();
         }
 
-        // Punch (single-hit kill)
-        if (Input.GetKeyDown(punchKey) && Time.time - lastPunchTime >= punchCooldown)
+        // Punch
+        if (Input.GetKeyDown(punchKey) && !isPunching && Time.time - lastPunchTime >= punchCooldown)
         {
             lastPunchTime = Time.time;
             StartCoroutine(PerformPunch());
@@ -114,75 +116,48 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator PerformPunch()
     {
-        isInteracting = true;
+        isPunching = true;
 
-        // Play punch animation if available
-        if (animator != null)
-        {
-            animator.SetBool("isWalking", false);
-            animator.SetTrigger("Punch"); // optional: create Trigger parameter "Punch" in Animator
-        }
+        // Stop walk anim, fire punch trigger
+        animator.SetBool("isWalking", false);
+        animator.SetTrigger("Punch");
 
-        // small delay to match animation timing (optional)
+        // Small delay to sync hit with animation
         if (punchHitDelay > 0f)
             yield return new WaitForSeconds(punchHitDelay);
         else
             yield return null;
 
-        // compute punch origin in front of player depending on facing
+        // Detect enemies in punch radius
         Vector2 origin = (Vector2)transform.position + (facingRight ? Vector2.right : Vector2.left) * punchOffset;
-
-        // detect all colliders in punch radius
         Collider2D[] hits = Physics2D.OverlapCircleAll(origin, punchRange);
-        bool hitAny = false;
+
         foreach (var hit in hits)
         {
             if (hit == null) continue;
-            // Try to find EnemyAI on the hit object or its parents
+
             EnemyAI enemy = hit.GetComponent<EnemyAI>();
             if (enemy == null)
                 enemy = hit.GetComponentInParent<EnemyAI>();
 
             if (enemy != null)
             {
-                // kill the enemy with single punch
                 enemy.Die();
-                hitAny = true;
+                Debug.Log("Punch hit enemy.");
             }
         }
 
-        // optional feedback
-        if (hitAny)
-        {
-            Debug.Log("Punch hit enemy(ies).");
-            // you can add sound, particle, etc. here
-        }
-        else
-        {
-            Debug.Log("Punch missed.");
-        }
+        // Wait for punch animation to finish before unlocking
+        yield return null;
+        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+        float length = state.length > 0.05f ? state.length : 0.3f;
+        yield return new WaitForSeconds(length);
 
-        // wait a short time for animation to finish (fallback)
-        float wait = 0.15f;
-        if (animator != null)
-        {
-            // attempt to read current state length, fallback to wait
-            yield return null;
-            AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
-            float length = state.length;
-            if (length > 0.05f)
-                wait = length;
-        }
-
-        yield return new WaitForSeconds(wait);
-
-        // reset interaction lock
-        isInteracting = false;
+        isPunching = false;
     }
 
     private void OnDrawGizmosSelected()
     {
-        // visualize punch area in editor
         Gizmos.color = Color.red;
         Vector3 origin = transform != null
             ? transform.position + (facingRight ? Vector3.right : Vector3.left) * punchOffset
@@ -227,7 +202,6 @@ public class PlayerController : MonoBehaviour
         else if (collision.gameObject.CompareTag("Task"))
         {
             currentInteractable = collision;
-
             SpriteRenderer targetRenderer = collision.gameObject.GetComponent<SpriteRenderer>();
             if (targetRenderer != null)
             {
@@ -241,7 +215,6 @@ public class PlayerController : MonoBehaviour
         {
             currentInteractable = collision;
             diaryUnlocker = collision.gameObject.GetComponent<DiaryUnlocker>();
-
             SpriteRenderer targetRenderer = collision.gameObject.GetComponent<SpriteRenderer>();
             if (targetRenderer != null)
             {
@@ -265,7 +238,6 @@ public class PlayerController : MonoBehaviour
                 color.a = 1f;
                 targetRenderer.color = color;
             }
-            Debug.Log(" ");
         }
 
         if (collision.gameObject.CompareTag("Scene"))
@@ -295,7 +267,6 @@ public class PlayerController : MonoBehaviour
 
     private void PerformInteraction(Collider2D collider)
     {
-        // --- Pick up object ---
         if (collider.CompareTag("Object"))
         {
             string objectName = collider.gameObject.name;
@@ -309,11 +280,10 @@ public class PlayerController : MonoBehaviour
             currentInteractable = null;
 
             StartCoroutine(PlayInteractAnimation());
-            Debug.Log($"Picked up '{objectName}' — Scroll to select, Q to preview");
+            Debug.Log($"Picked up '{objectName}'");
             return;
         }
 
-        // --- Task interaction ---
         if (collider.CompareTag("Task"))
         {
             if (!InventoryManager.Instance.GetItems().Contains("Letter"))
@@ -321,26 +291,17 @@ public class PlayerController : MonoBehaviour
                 Debug.Log("I Should Check if I find any mails");
                 return;
             }
-            Debug.Log("Task interaction fired!");
 
-            // Hide the task object
             SpriteRenderer taskRenderer = collider.gameObject.GetComponent<SpriteRenderer>();
             if (taskRenderer != null)
             {
                 Color c = taskRenderer.color;
                 c.a = 0f;
                 taskRenderer.color = c;
-                Debug.Log("Task sprite hidden.");
-            }
-            else
-            {
-                Debug.LogWarning("Task has no SpriteRenderer!");
             }
 
-            // Disable task collider
             collider.gameObject.SetActive(false);
 
-            // Reveal and enable the key
             if (key != null)
             {
                 SpriteRenderer keyRenderer = key.GetComponent<SpriteRenderer>();
@@ -349,23 +310,11 @@ public class PlayerController : MonoBehaviour
                     Color c = keyRenderer.color;
                     c.a = 1f;
                     keyRenderer.color = c;
-                    Debug.Log("Key revealed.");
-                }
-                else
-                {
-                    Debug.LogWarning("Key has no SpriteRenderer!");
                 }
 
                 Collider2D keyCol = key.GetComponent<Collider2D>();
                 if (keyCol != null)
-                {
                     keyCol.enabled = true;
-                    Debug.Log("Key collider enabled.");
-                }
-                else
-                {
-                    Debug.LogWarning("Key has no Collider2D!");
-                }
             }
             else
             {
@@ -376,7 +325,6 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // --- Diary unlock ---
         if (collider.CompareTag("Diary"))
         {
             DiaryUnlocker unlocker = collider.gameObject.GetComponent<DiaryUnlocker>();
@@ -387,7 +335,6 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // --- Scene trigger ---
         if (collider.CompareTag("Scene"))
         {
             if (string.IsNullOrEmpty(SceneSwitch))

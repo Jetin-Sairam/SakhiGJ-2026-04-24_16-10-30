@@ -15,11 +15,13 @@ public class EnemyAI : MonoBehaviour
 
     private SpriteRenderer spriteRenderer;
     private Collider2D col;
+    private Animator animator;
 
     void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -30,61 +32,83 @@ public class EnemyAI : MonoBehaviour
 
         if (distance > attackRange)
         {
-            // Move towards player
             isWaiting = false;
+
+            // Animation: running
+            SetAnimationState(isRunning: true, isIdle: false, isAttacking: false);
+
             Vector2 direction = (player.position - transform.position).normalized;
             transform.Translate(direction * moveSpeed * Time.deltaTime);
 
-            // Flip sprite to face player
             if (spriteRenderer != null)
                 spriteRenderer.flipX = direction.x < 0;
         }
         else
         {
-            // In range — wait then attack
             if (!isWaiting && !hasAttacked)
             {
                 isWaiting = true;
+
+                // Animation: idle while waiting
+                SetAnimationState(isRunning: false, isIdle: true, isAttacking: false);
+
                 StartCoroutine(WaitAndAttack());
             }
         }
     }
 
+    private void SetAnimationState(bool isRunning, bool isIdle, bool isAttacking)
+    {
+        if (animator == null) return;
+        animator.SetBool("isRunning", isRunning);
+        animator.SetBool("isIdle", isIdle);
+        animator.SetBool("isAttacking", isAttacking);
+    }
+
     private IEnumerator WaitAndAttack()
     {
-        Debug.Log($"{gameObject.name} waiting to attack...");
         yield return new WaitForSeconds(waitBeforeAttack);
-
         if (isDead) yield break;
 
         hasAttacked = true;
-        Debug.Log($"{gameObject.name} attacked the player!");
 
-        // Player hit — reload scene
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        // Animation: attack
+        SetAnimationState(isRunning: false, isIdle: false, isAttacking: true);
+
+        // Wait for attack animation to roughly finish before reloading
+        yield return new WaitForSeconds(0.5f);
+
+        if (!isDead)
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    // Call this when player hits the enemy
     public void Die()
     {
         if (isDead) return;
         isDead = true;
 
-        Debug.Log($"{gameObject.name} died.");
-
-        // Stop all coroutines so attack doesn't fire after death
         StopAllCoroutines();
 
-        // Disable collider so no more interactions
         if (col != null)
             col.enabled = false;
 
-        // Fade out then destroy
+        // Turn off all other bools, set isDead
+        if (animator != null)
+        {
+            animator.SetBool("isRunning", false);
+            animator.SetBool("isIdle", false);
+            animator.SetBool("isAttacking", false);
+            animator.SetBool("isDead", true);
+        }
+
         StartCoroutine(FadeAndDestroy());
     }
 
     private IEnumerator FadeAndDestroy()
     {
+        // Give the dead animation time to play before fading
+        yield return new WaitForSeconds(0.4f);
+
         float elapsed = 0f;
         float fadeDuration = 0.3f;
 

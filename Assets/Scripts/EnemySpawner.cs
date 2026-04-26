@@ -1,5 +1,6 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class EnemySpawner : MonoBehaviour
     private Transform player;
     private int enemiesSpawned = 0;
 
+
     void Start()
     {
         // Find player by tag
@@ -38,12 +40,16 @@ public class EnemySpawner : MonoBehaviour
         {
             SpawnEnemy();
             enemiesSpawned++;
-
             if (enemiesSpawned < numberOfEnemies)
                 yield return new WaitForSeconds(timeBetweenSpawns);
         }
-
-        Debug.Log("All enemies spawned.");
+        Debug.Log("Looks Like thats all of them.");
+        yield return new WaitForSeconds(2f);
+        Debug.Log("Dont seem like their boss is here!");
+        yield return new WaitForSeconds(2f);
+        Debug.Log("Better get back to uncle Kabir");
+        yield return new WaitForSeconds(2f);
+        SceneManager.LoadScene("Uncle's House 2");
     }
 
     private void SpawnEnemy()

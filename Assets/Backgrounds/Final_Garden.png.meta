@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: ea70caadc87e28d49a7404b1a224218f
+guid: 7e5bd9fa0636b4446971b785ae3c639e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 661320264985872880
-    second: Gemini_Generated_Image_pjfautpjfautpjfa_0
+      213: 2626747714265551342
+    second: Final_Garden_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Gemini_Generated_Image_pjfautpjfautpjfa_0
+      name: Final_Garden_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 2752
-        height: 1536
+        width: 1351
+        height: 768
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 0f90045f64b7d2900800000000000000
-      internalID: 661320264985872880
+      spriteID: ee11e570125147420800000000000000
+      internalID: 2626747714265551342
       vertices: []
       indices: 
       edges: []
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Gemini_Generated_Image_pjfautpjfautpjfa_0: 661320264985872880
+      Final_Garden_0: 2626747714265551342
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

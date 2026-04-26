@@ -1,22 +1,31 @@
 fileFormatVersion: 2
-guid: 7982018fb72471e4b896ad4635a7075b
+guid: 91e1b0fb794ca30499b8fd81a7f55af1
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2649847697073447219
-    second: Dead_0
+      213: -4882787396406508289
+    second: Bad uncle_idle_0
   - first:
-      213: -8293461521501190705
-    second: Dead_1
+      213: -4399994500927191814
+    second: Bad uncle_idle_1
   - first:
-      213: -1631342717326862633
-    second: Dead_2
+      213: -231763135235661725
+    second: Bad uncle_idle_2
   - first:
-      213: -3927913518680497933
-    second: Dead_3
+      213: -2387271171847498339
+    second: Bad uncle_idle_3
   - first:
-      213: -1057675302478342458
-    second: Dead_4
+      213: -1253425058132211387
+    second: Bad uncle_idle_4
+  - first:
+      213: -675929812410716552
+    second: Bad uncle_idle_5
+  - first:
+      213: -3590747324175284387
+    second: Bad uncle_idle_6
+  - first:
+      213: -9152831291168794363
+    second: Bad uncle_idle_7
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -63,7 +72,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 27
+  spritePixelsToUnits: 300
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -151,13 +160,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Dead_0
+      name: Bad uncle_idle_0
       rect:
         serializedVersion: 2
-        x: 44
-        y: 0
-        width: 29
-        height: 70
+        x: 87
+        y: 177
+        width: 524
+        height: 898
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -166,20 +175,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 33123f4e07626c420800000000000000
-      internalID: 2649847697073447219
+      spriteID: ff48f6babbadc3cb0800000000000000
+      internalID: -4882787396406508289
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Dead_1
+      name: Bad uncle_idle_1
       rect:
         serializedVersion: 2
-        x: 174
-        y: 0
-        width: 28
-        height: 69
+        x: 807
+        y: 177
+        width: 524
+        height: 898
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -188,20 +197,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: fc50d84dfa4b7ec80800000000000000
-      internalID: -8293461521501190705
+      spriteID: af40096405410f2c0800000000000000
+      internalID: -4399994500927191814
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Dead_2
+      name: Bad uncle_idle_2
       rect:
         serializedVersion: 2
-        x: 301
-        y: 0
-        width: 49
-        height: 62
+        x: 1527
+        y: 177
+        width: 522
+        height: 905
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -210,20 +219,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7d6dfca117e4c59e0800000000000000
-      internalID: -1631342717326862633
+      spriteID: 3606f3c08ac98ccf0800000000000000
+      internalID: -231763135235661725
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Dead_3
+      name: Bad uncle_idle_3
       rect:
         serializedVersion: 2
-        x: 430
-        y: 0
-        width: 61
-        height: 43
+        x: 2247
+        y: 177
+        width: 522
+        height: 905
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -232,20 +241,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3f0289a377f3d79c0800000000000000
-      internalID: -3927913518680497933
+      spriteID: d95df7b7485beded0800000000000000
+      internalID: -2387271171847498339
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Dead_4
+      name: Bad uncle_idle_4
       rect:
         serializedVersion: 2
-        x: 558
-        y: 0
-        width: 66
-        height: 14
+        x: 2967
+        y: 177
+        width: 522
+        height: 905
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -254,8 +263,74 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 6c6131c8ae16251f0800000000000000
-      internalID: -1057675302478342458
+      spriteID: 549c471fc80fa9ee0800000000000000
+      internalID: -1253425058132211387
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bad uncle_idle_5
+      rect:
+        serializedVersion: 2
+        x: 3687
+        y: 177
+        width: 522
+        height: 905
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87ea926ba6d9e96f0800000000000000
+      internalID: -675929812410716552
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bad uncle_idle_6
+      rect:
+        serializedVersion: 2
+        x: 4407
+        y: 177
+        width: 522
+        height: 905
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d570950555a1b2ec0800000000000000
+      internalID: -3590747324175284387
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bad uncle_idle_7
+      rect:
+        serializedVersion: 2
+        x: 5127
+        y: 177
+        width: 522
+        height: 905
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 509ddc83f6c9af080800000000000000
+      internalID: -9152831291168794363
       vertices: []
       indices: 
       edges: []
@@ -274,11 +349,14 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Dead_0: 2649847697073447219
-      Dead_1: -8293461521501190705
-      Dead_2: -1631342717326862633
-      Dead_3: -3927913518680497933
-      Dead_4: -1057675302478342458
+      Bad uncle_idle_0: -4882787396406508289
+      Bad uncle_idle_1: -4399994500927191814
+      Bad uncle_idle_2: -231763135235661725
+      Bad uncle_idle_3: -2387271171847498339
+      Bad uncle_idle_4: -1253425058132211387
+      Bad uncle_idle_5: -675929812410716552
+      Bad uncle_idle_6: -3590747324175284387
+      Bad uncle_idle_7: -9152831291168794363
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
