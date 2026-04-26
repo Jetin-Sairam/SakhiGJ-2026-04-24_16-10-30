@@ -7,6 +7,15 @@ public class PlayerController : MonoBehaviour
     public float speed = 5f;
     public float interactClipLength = 0.5f;
 
+    // --- Punch settings (single-hit kill) ---
+    [Header("Punch")]
+    public KeyCode punchKey = KeyCode.Space;
+    public float punchRange = 0.6f;           // radius of the punch hit area
+    public float punchOffset = 0.6f;          // how far in front of the player to check
+    public float punchCooldown = 0.5f;        // minimum time between punches
+    public float punchHitDelay = 0.05f;       // small delay to sync with animation (optional)
+    private float lastPunchTime = -999f;
+
     private string SceneSwitch;
     private Collider2D currentInteractable;
     private SceneItemRequirement sceneGate;
@@ -59,6 +68,7 @@ public class PlayerController : MonoBehaviour
 
         if (isInteracting) return;
 
+        // Movement
         if (Input.GetKey(KeyCode.A))
         {
             transform.Translate(Vector3.left * Time.deltaTime * speed);
@@ -76,20 +86,108 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("isWalking", false);
         }
 
+        // Interact / Scene
         if (currentInteractable != null && Input.GetKeyDown(KeyCode.E))
             PerformInteraction(currentInteractable);
 
+        // Preview
         if (Input.GetKeyDown(KeyCode.Q))
         {
             if (FadeManager.Instance != null)
                 FadeManager.Instance.TogglePreview();
         }
 
+        // Diary
         if (Input.GetKeyDown(KeyCode.R))
         {
             if (FadeManager.Instance != null)
                 FadeManager.Instance.ToggleDiary();
         }
+
+        // Punch (single-hit kill)
+        if (Input.GetKeyDown(punchKey) && Time.time - lastPunchTime >= punchCooldown)
+        {
+            lastPunchTime = Time.time;
+            StartCoroutine(PerformPunch());
+        }
+    }
+
+    private IEnumerator PerformPunch()
+    {
+        isInteracting = true;
+
+        // Play punch animation if available
+        if (animator != null)
+        {
+            animator.SetBool("isWalking", false);
+            animator.SetTrigger("Punch"); // optional: create Trigger parameter "Punch" in Animator
+        }
+
+        // small delay to match animation timing (optional)
+        if (punchHitDelay > 0f)
+            yield return new WaitForSeconds(punchHitDelay);
+        else
+            yield return null;
+
+        // compute punch origin in front of player depending on facing
+        Vector2 origin = (Vector2)transform.position + (facingRight ? Vector2.right : Vector2.left) * punchOffset;
+
+        // detect all colliders in punch radius
+        Collider2D[] hits = Physics2D.OverlapCircleAll(origin, punchRange);
+        bool hitAny = false;
+        foreach (var hit in hits)
+        {
+            if (hit == null) continue;
+            // Try to find EnemyAI on the hit object or its parents
+            EnemyAI enemy = hit.GetComponent<EnemyAI>();
+            if (enemy == null)
+                enemy = hit.GetComponentInParent<EnemyAI>();
+
+            if (enemy != null)
+            {
+                // kill the enemy with single punch
+                enemy.Die();
+                hitAny = true;
+            }
+        }
+
+        // optional feedback
+        if (hitAny)
+        {
+            Debug.Log("Punch hit enemy(ies).");
+            // you can add sound, particle, etc. here
+        }
+        else
+        {
+            Debug.Log("Punch missed.");
+        }
+
+        // wait a short time for animation to finish (fallback)
+        float wait = 0.15f;
+        if (animator != null)
+        {
+            // attempt to read current state length, fallback to wait
+            yield return null;
+            AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+            float length = state.length;
+            if (length > 0.05f)
+                wait = length;
+        }
+
+        yield return new WaitForSeconds(wait);
+
+        // reset interaction lock
+        isInteracting = false;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        // visualize punch area in editor
+        Gizmos.color = Color.red;
+        Vector3 origin = transform != null
+            ? transform.position + (facingRight ? Vector3.right : Vector3.left) * punchOffset
+            : Vector3.zero;
+        Gizmos.DrawWireSphere(origin, punchRange);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -128,7 +226,6 @@ public class PlayerController : MonoBehaviour
         }
         else if (collision.gameObject.CompareTag("Task"))
         {
-            // *** THIS WAS MISSING — must set currentInteractable ***
             currentInteractable = collision;
 
             SpriteRenderer targetRenderer = collision.gameObject.GetComponent<SpriteRenderer>();

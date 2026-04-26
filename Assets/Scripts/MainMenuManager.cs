@@ -5,7 +5,8 @@ public class MainMenuManager : MonoBehaviour
 {
     public Button newGameButton;
     public Button continueButton;
-    public string firstSceneName = "Scene1";
+    public string firstSceneName = "House";
+    public GameObject MenuPanel;
 
     void Start()
     {
@@ -21,12 +22,15 @@ public class MainMenuManager : MonoBehaviour
     {
         Debug.Log("New Game.");
         SaveManager.Instance.NewGame("House");
+        MenuPanel.SetActive(false);
+        Debug.Log("Use  A & D  to  Move,  E to Interact");
     }
 
     public void OnContinue()
     {
         Debug.Log("Continue.");
         SaveManager.Instance.ContinueGame();
+        MenuPanel.SetActive(false);
     }
 
     public void OnQuit()

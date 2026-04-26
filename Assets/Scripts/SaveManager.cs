@@ -78,7 +78,7 @@ public class SaveManager : MonoBehaviour
         PlayerPrefs.SetString(KEY_CURRENT_SCENE, sceneName);
         PlayerPrefs.SetInt(KEY_HAS_SAVE, 1);
         PlayerPrefs.Save();
-        Debug.Log($"Scene saved: {sceneName}");
+        Debug.Log($"Use  A & D  to  Move,  E to Interact");
     }
 
     public void SaveAll()
@@ -152,7 +152,6 @@ public class SaveManager : MonoBehaviour
         bool unlocked = PlayerPrefs.GetInt(KEY_DIARY_UNLOCKED, 0) == 1;
         int page = PlayerPrefs.GetInt(KEY_DIARY_PAGE, 0);
         FadeManager.Instance.RestoreDiaryState(unlocked, page);
-        Debug.Log($"Diary loaded — unlocked: {unlocked}, page: {page}");
     }
 
     // ── Unlocked Gates ────────────────────────────────────────
@@ -175,7 +174,5 @@ public class SaveManager : MonoBehaviour
                 if (!string.IsNullOrEmpty(gate))
                     SceneItemRequirement.RestoreUnlockedGate(gate);
         }
-
-        Debug.Log($"Gates loaded: {raw}");
     }
 }

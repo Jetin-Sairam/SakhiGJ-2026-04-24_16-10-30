@@ -153,6 +153,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   speed: 3.5
   interactClipLength: 0.5
+  punchKey: 32
+  punchRange: 0.6
+  punchOffset: 0.6
+  punchCooldown: 0.5
+  punchHitDelay: 0.05
   key: {fileID: 0}
 --- !u!61 &5208415120603714628
 BoxCollider2D:
